@@ -2,5 +2,11 @@
 
 ## Starting & Stopping the API.
 
-Start: `./vendor/bin/sail up -d --build`
-Stop: `./vendor/bin/sail up`
+1. Install NPM dependencies:
+
+- `npm install; npm run build`
+
+1. Start Docker containers:
+
+- Start: `./vendor/bin/sail up -d --build`
+- Stop: `./vendor/bin/sail down`
