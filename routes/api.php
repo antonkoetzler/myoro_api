@@ -1,7 +1,9 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/signup', [AuthController::class, 'signup']);
-Route::post('/login', [AuthController::class, 'login']);
+// User routes.
+Route::apiResource('/users', UserController::class);
+Route::post('/users/signup', [UserController::class, 'signup']);
+Route::post('/users/login', [UserController::class, 'login']);
