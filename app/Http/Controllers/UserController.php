@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\SignupRequest;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
@@ -69,16 +71,10 @@ class UserController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function signup(Request $request): JsonResponse
+    public function signup(SignupRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                User::NAME => ['required', 'string', 'max:255', 'unique:users,username'],
-                User::USERNAME => ['required', 'string', 'max:255', 'unique:users,username'],
-                User::EMAIL => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-                User::PASSWORD => ['required', 'string', 'min:8', 'confirmed'],
-            ]);
-            $user = $this->userService->signup($validated);
+            $user = $this->userService->signup($request->validated);
             $token = $user->createToken('MyoroAPI')->plainTextToken;
             return response()->json([
                 'message' => 'User registered successfully!',
@@ -99,23 +95,10 @@ class UserController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                User::USERNAME => ['nullable', 'string'],
-                User::EMAIL => ['nullable', 'string', 'email'],
-                User::PASSWORD => ['required', 'string'],
-            ]);
-            if (
-                (!isset($validated[User::USERNAME]) && !isset($validated[User::EMAIL])) ||
-                (isset($validated[User::USERNAME]) && isset($validated[User::EMAIL]))
-            ) {
-                return response()->json([
-                    'message' => 'Username (x)or e-mail is required.',
-                ], 400);
-            }
-            $user = $this->userService->login($validated);
+            $user = $this->userService->login($request->validated);
             $token = $user->createToken('MyoroAPI')->plainTextToken;
             return response()->json([
                 'message' => 'Login successful!',
