@@ -2,4 +2,4 @@
 
 1. Testing endpoints;
 
-- How to get a test pgsql database running during tests.
+- Create debug .env and get postgres working in laravel tests.
