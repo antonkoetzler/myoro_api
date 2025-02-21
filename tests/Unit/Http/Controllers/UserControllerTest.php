@@ -16,16 +16,16 @@ class UserControllerTest extends TestCase
     public function testIndex(): void
     {
         // Arrange: Mock the User model's 'all' method
-        $mock = Mockery::mock('alias:' . User::class);
+        /* $mock = Mockery::mock('alias:' . User::class);
         $mock->shouldReceive('all')
             ->once()
             ->andReturn(collect([
                 (object) ['name' => 'John Doe'],
                 (object) ['name' => 'Jane Doe'],
-            ]));
+            ])); */
 
         // Act: Call the controller method
-        $controller = new UserController($this->createMock(UserService::class));
+        $controller = new UserController(new UserService());
         $response = $controller->index(new Request());
 
         // Assert: Verify the response
