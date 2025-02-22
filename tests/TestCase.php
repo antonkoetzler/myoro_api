@@ -2,9 +2,9 @@
 
 namespace Tests;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Mockery;
 
 /**
  * Abstract class that must be extended by all tests.
@@ -21,5 +21,15 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
         $this->setUpFaker();
+        Mockery::globalHelpers();
+    }
+
+    /**
+     * Runs after tests have executed.
+     */
+    public function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
     }
 }

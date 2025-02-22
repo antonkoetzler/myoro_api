@@ -29,8 +29,6 @@ class UserControllerTest extends TestCase
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(json_encode([$user->toArray()]), $response->getContent());
-
-        Mockery::close();
     }
 
     public function testStore(): void
@@ -40,9 +38,10 @@ class UserControllerTest extends TestCase
         $controller->store();
     }
 
+    // TODO: Still have to finish.
     public function testShowWhenUserExists(): void
     {
-        $user = User::factory()->create(); // TODO: Assert that it came.
+        /* $user = User::factory()->create(); */
 
         $controller = new UserController(new UserService());
         $response = $controller->show(1);
