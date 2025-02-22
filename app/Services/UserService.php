@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -10,6 +11,16 @@ use Illuminate\Support\Facades\Hash;
  */
 class UserService
 {
+    /**
+     * IOC-able User:all.
+     *
+     * @return Collection
+     */
+    public function all(): Collection
+    {
+        return User::all();
+    }
+
     /**
      * Signs up a User.
      *
@@ -47,4 +58,3 @@ class UserService
         return $user;
     }
 }
-

@@ -2,37 +2,51 @@
 
 namespace Tests\Unit\Http\Controllers;
 
+use App\Exceptions\UnimplementedException;
 use App\Http\Controllers\UserController;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Mockery;
+use Mockery\MockInterface;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {
-    // TODO: No mockery, create a docker container for tests.
     public function testIndex(): void
     {
-        // Arrange: Mock the User model's 'all' method
-        /* $mock = Mockery::mock('alias:' . User::class);
-        $mock->shouldReceive('all')
-            ->once()
-            ->andReturn(collect([
-                (object) ['name' => 'John Doe'],
-                (object) ['name' => 'Jane Doe'],
-            ])); */
+        $user = User::factory()->create();
 
-        // Act: Call the controller method
-        $controller = new UserController(new UserService());
+        /** @var UserService|LegacyMockInterface|MockInterface */
+        $userServiceMock = Mockery::mock(UserService::class);
+        $userServiceMock->shouldReceive('all')
+            ->once()
+            ->andReturn(collect([$user]));
+
+        $controller = new UserController($userServiceMock);
         $response = $controller->index(new Request());
 
-        // Assert: Verify the response
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals('[{"name":"John Doe"},{"name":"Jane Doe"}]', $response->getContent());
+        $this->assertEquals(json_encode([$user->toArray()]), $response->getContent());
 
-        // Clean up Mockery after the test
         Mockery::close();
+    }
+
+    public function testStore(): void
+    {
+        $this->expectException(UnimplementedException::class);
+        $controller = new UserController(new UserService());
+        $controller->store();
+    }
+
+    public function testShowWhenUserExists(): void
+    {
+        $user = User::factory()->create(); // TODO: Assert that it came.
+
+        $controller = new UserController(new UserService());
+        $response = $controller->show(1);
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
     }
 }

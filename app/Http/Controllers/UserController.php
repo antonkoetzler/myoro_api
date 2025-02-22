@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UnimplementedException;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\SignupRequest;
 use App\Models\User;
@@ -12,7 +13,11 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
     protected UserService $userService;
-
+    /**
+     * Get the model class name.
+     *
+     * @return string
+     */
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
@@ -20,18 +25,21 @@ class UserController extends Controller
 
     /**
      * Display a listing of the resource.
+     *
      */
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
-        return response()->json(User::all());
+        return response()->json($this->userService->all());
     }
 
     /**
      * Store implementation.
+     *
+     * @noinspection PhpUnusedParameterInspection
      */
-    public function store(Request $request): JsonResponse
+    public function store(): JsonResponse
     {
-        throw new \Exception('Not implemented', 501);
+        throw new UnimplementedException();
     }
 
     /**
@@ -39,7 +47,7 @@ class UserController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $model = User::findOrFail($id);
+        $model = User::find($id);
         if (!$model) {
             return response()->json(
                 ['message' => 'User not found.'],
@@ -52,17 +60,17 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(): JsonResponse
     {
-        throw new \Exception('Not implemented', 501);
+        throw new UnimplementedException();
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(): JsonResponse
     {
-        throw new \Exception('Not implemented', 501);
+        throw new UnimplementedException();
     }
 
     /**
