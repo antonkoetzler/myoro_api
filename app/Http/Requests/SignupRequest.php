@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SignupRequest extends FormRequest
@@ -24,10 +25,10 @@ class SignupRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:users,username',
-            'username' => 'required|string|max:255|unique:users,username',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            User::NAME => 'required|string|max:255|unique:users,username',
+            User::USERNAME => 'required|string|max:255|unique:users,username',
+            User::EMAIL => 'required|string|email|max:255|unique:users,email',
+            User::PASSWORD => 'required|string|min:8|confirmed',
         ];
     }
 }

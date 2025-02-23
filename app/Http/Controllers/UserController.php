@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ResourceNotFoundException;
 use App\Exceptions\UnimplementedException;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\SignupRequest;
@@ -49,10 +50,7 @@ class UserController extends Controller
     {
         $model = User::find($id);
         if (!$model) {
-            return response()->json(
-                ['message' => 'User not found.'],
-                404,
-            );
+            throw new ResourceNotFoundException();
         }
         return response()->json($model);
     }
@@ -76,13 +74,14 @@ class UserController extends Controller
     /**
      * Signup implementation.
      *
-     * @param Request $request
+     * @param SignupRequst $request
      * @return JsonResponse
      */
     public function signup(SignupRequest $request): JsonResponse
     {
         try {
-            $user = $this->userService->signup($request->validated);
+            $validatedData = $request->validated();
+            $user = $this->userService->signup($validatedData);
             $token = $user->createToken('MyoroAPI')->plainTextToken;
             return response()->json([
                 'message' => 'User registered successfully!',
@@ -100,13 +99,14 @@ class UserController extends Controller
     /**
      * Login implementation.
      *
-     * @param Request $request
+     * @param LoginRequest $request
      * @return JsonResponse
      */
     public function login(LoginRequest $request): JsonResponse
     {
         try {
-            $user = $this->userService->login($request->validated);
+            $validatedData = $request->validated();
+            $user = $this->userService->login($validatedData);
             $token = $user->createToken('MyoroAPI')->plainTextToken;
             return response()->json([
                 'message' => 'Login successful!',
