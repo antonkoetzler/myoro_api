@@ -6,6 +6,6 @@ use Exception;
 
 class UnimplementedException extends Exception
 {
-    protected $message = 'Not unimplemented.';
+    protected $message = 'Not implemented.';
     protected $code = 501;
 }
