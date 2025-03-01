@@ -18,7 +18,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Runs before the test starts.
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->setUpFaker();
