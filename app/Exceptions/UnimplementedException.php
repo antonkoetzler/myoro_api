@@ -2,10 +2,9 @@
 
 namespace App\Exceptions;
 
-use Exception;
-
-class UnimplementedException extends Exception
+class UnimplementedException extends ApiException
 {
     protected $message = 'Not implemented.';
     protected $code = 501;
 }
+

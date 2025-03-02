@@ -2,12 +2,10 @@
 
 namespace App\Exceptions;
 
-use Exception;
-
 /**
  * Exception to use when a certain resouce was not found.
  */
-class ResourceNotFoundException extends Exception
+class ResourceNotFoundException extends ApiException
 {
     protected $message = 'Resource not found.';
     protected $code = 404;
