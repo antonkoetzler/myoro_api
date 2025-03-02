@@ -2,20 +2,20 @@
 
 namespace Tests\Unit\Http\Requests;
 
-use App\Http\Requests\LoginRequest;
+use App\Http\Requests\SignupRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Tests\TestCase;
 
-class LoginRequestTest extends TestCase
+class SignupRequestTest extends TestCase
 {
-    protected LoginRequest $request;
+    protected SignupRequest $request;
     protected array $rules;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->request = new LoginRequest();
+        $this->request = new SignupRequest();
         $this->rules = $this->request->rules();
     }
 
@@ -24,20 +24,23 @@ class LoginRequestTest extends TestCase
         $validationData = [];
         $validator = Validator::make($validationData, $this->rules);
         $this->assertTrue($validator->fails());
-        $this->assertEquals('', $validator->errors()->first(User::USERNAME));
-        $this->assertEquals('', $validator->errors()->first(User::EMAIL));
+        $this->assertEquals('The ' . User::NAME . ' field is required.', $validator->errors()->first(User::NAME));
+        $this->assertEquals('The ' . User::USERNAME . ' field is required.', $validator->errors()->first(User::USERNAME));
+        $this->assertEquals('The ' . User::EMAIL . ' field is required.', $validator->errors()->first(User::EMAIL));
         $this->assertEquals('The ' . User::PASSWORD . ' field is required.', $validator->errors()->first(User::PASSWORD));
     }
 
     public function testInvalidTypesCase(): void
     {
         $validationData = [
+            User::NAME => $this->faker->randomNumber(),
             User::USERNAME => $this->faker->randomNumber(),
             User::EMAIL => $this->faker->randomNumber(),
             User::PASSWORD => $this->faker->randomNumber(),
         ];
         $validator = Validator::make($validationData, $this->rules);
         $this->assertTrue($validator->fails());
+        $this->assertEquals('The ' . User::NAME . ' field must be a string.', $validator->errors()->first(User::NAME));
         $this->assertEquals('The ' . User::USERNAME . ' field must be a string.', $validator->errors()->first(User::USERNAME));
         $this->assertEquals('The ' . User::EMAIL . ' field must be a string.', $validator->errors()->first(User::EMAIL));
         $this->assertEquals('The ' . User::PASSWORD . ' field must be a string.', $validator->errors()->first(User::PASSWORD));
@@ -46,41 +49,22 @@ class LoginRequestTest extends TestCase
     public function testInvalidEmailCase(): void
     {
         $validationData = [
-            User::EMAIL => 'Hello, World!',
+            User::EMAIL => $this->faker->word(),
         ];
         $validator = Validator::make($validationData, $this->rules);
         $this->assertTrue($validator->fails());
         $this->assertEquals('The ' . User::EMAIL . ' field must be a valid email address.', $validator->errors()->first(User::EMAIL));
     }
 
-    public function testNoUsernameAndEmailProvidedCase(): void
-    {
-        $validationData = [];
-        $validator = Validator::make($validationData, $this->rules);
-        $this->request->withValidator($validator);
-        $this->assertTrue($validator->fails());
-        $this->assertEquals('Username (x)or email is required.', $validator->errors()->first(User::USERNAME));
-    }
-
-    public function testUsernameAndEmailProvidedCase(): void
-    {
-        $validationData = [
-            User::USERNAME => $this->faker->userName(),
-            User::EMAIL => $this->faker->email(),
-        ];
-        $validator = Validator::make($validationData, $this->rules);
-        $this->request->withValidator($validator);
-        $this->assertTrue($validator->fails());
-        $this->assertEquals('Username (x)or email is required.', $validator->errors()->first(User::USERNAME));
-    }
-
     public function testSuccessCase(): void
     {
-        $usernameProvided = $this->faker->boolean();
+        $password = $this->faker->lexify(str_repeat('?', $this->faker->numberBetween(8, 255)));
         $validationData = [
-            User::USERNAME => $usernameProvided ? $this->faker->userName() : null,
-            User::EMAIL => $usernameProvided ? null : $this->faker->email(),
-            User::PASSWORD => $this->faker->password(),
+            User::NAME => $this->faker->name(),
+            User::USERNAME => $this->faker->lexify(str_repeat('?', $this->faker->numberBetween(8, 255))),
+            User::EMAIL => $this->faker->email(),
+            User::PASSWORD => $password,
+            User::PASSWORD_CONFIRMATION => $password,
         ];
         $validator = Validator::make($validationData, $this->rules);
         $this->assertTrue($validator->passes());

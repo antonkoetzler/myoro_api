@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,9 +26,9 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => 'nullable|string',
-            'email' => 'nullable|string|email',
-            'password' => 'required|string',
+            User::USERNAME => 'nullable|string',
+            User::EMAIL => 'nullable|string|email',
+            User::PASSWORD => 'required|string',
         ];
     }
 
@@ -40,11 +41,9 @@ class LoginRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function ($validator) {
-            if (!$this->username && !$this->email) {
-                $validator->errors()->add('username', 'Username or email is required.');
-            }
-            if ($this->username && $this->email) {
-                $validator->errors()->add('username', 'Only one of username or email should be provided.');
+            if ((!$this->username && !$this->email) || ($this->username && $this->email)) {
+                $validator->errors()->add(User::USERNAME, 'Username (x)or email is required.');
+                $validator->errors()->add(User::EMAIL, 'Username (x)or email is required.');
             }
         });
     }
