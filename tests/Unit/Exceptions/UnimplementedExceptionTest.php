@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class UnimplementedExceptionTest extends TestCase
 {
-    function testException(): void
+    public function testException(): void
     {
         $exception = new UnimplementedException();
         $this->assertEquals('Not implemented.', $exception->getMessage());
