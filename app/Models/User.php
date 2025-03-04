@@ -8,20 +8,33 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
- * @mixin \Eloquent
+ * @mixin \Illuminate\Database\Eloquent\Model
+ *
+ * @property int $id
+ * @property string $username
+ * @property string $email
+ * @property string $password
+ *
+ * @method static User create(array<string, mixed> $attributes = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<User> where(string $column, mixed $value)
+ * @method static \Illuminate\Database\Eloquent\Builder<User> orWhere(string $column, mixed $value)
+ * @method static User|null first()
+ * @method static User|null find(mixed $id)
  */
 class User extends Authenticatable
 {
-    const NAME = 'name';
-    const USERNAME = 'username';
-    const EMAIL = 'email';
-    const PASSWORD = 'password';
-    const PASSWORD_CONFIRMATION = 'password_confirmation';
-    const REMEMBER_TOKEN = 'remember_token';
-    const EMAIL_VERIFIED_AT = 'email_verified_at';
-
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory;
+    use Notifiable;
+    use HasApiTokens;
+
+    public const NAME = 'name';
+    public const USERNAME = 'username';
+    public const EMAIL = 'email';
+    public const PASSWORD = 'password';
+    public const PASSWORD_CONFIRMATION = 'password_confirmation';
+    public const REMEMBER_TOKEN = 'remember_token';
+    public const EMAIL_VERIFIED_AT = 'email_verified_at';
 
     /**
      * The attributes that are mass assignable.

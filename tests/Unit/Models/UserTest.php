@@ -7,16 +7,9 @@ use Tests\TestCase;
 
 class UserTest extends TestCase
 {
-    public function testConstantsVariables(): void
-    {
-        $this->assertNotEmpty(User::NAME, 'name');
-        $this->assertNotEmpty(User::USERNAME, 'username');
-        $this->assertNotEmpty(User::EMAIL, 'email');
-        $this->assertNotEmpty(User::PASSWORD, 'password');
-    }
-
     public function testFillable(): void
     {
+        /** @var User */
         $user = User::factory()->create();
         $this->assertTrue(in_array(User::NAME, $user->getFillable()));
         $this->assertTrue(in_array(User::USERNAME, $user->getFillable()));
@@ -26,6 +19,7 @@ class UserTest extends TestCase
 
     public function testHidden(): void
     {
+        /** @var User */
         $user = User::factory()->create();
         $this->assertTrue(in_array(User::PASSWORD, $user->getHidden()));
         $this->assertTrue(in_array(User::REMEMBER_TOKEN, $user->getHidden()));

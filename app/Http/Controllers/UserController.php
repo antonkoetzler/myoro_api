@@ -73,12 +73,14 @@ class UserController extends Controller
     /**
      * Signup implementation.
      *
-     * @param SignupRequst $request
+     * @param SignupRequest $request
+     *
      * @return JsonResponse
      */
     public function signup(SignupRequest $request): JsonResponse
     {
         try {
+            /** @var array<string, string|null> */
             $validatedData = $request->validated();
             $user = $this->userService->signup($validatedData);
             $token = $user->createToken('MyoroAPI')->plainTextToken;
@@ -104,6 +106,7 @@ class UserController extends Controller
     public function login(LoginRequest $request): JsonResponse
     {
         try {
+            /** @var array<string, string> */
             $validatedData = $request->validated();
             $user = $this->userService->login($validatedData);
             $token = $user->createToken('MyoroAPI')->plainTextToken;

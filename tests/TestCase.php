@@ -13,7 +13,8 @@ use Mockery;
  */
 abstract class TestCase extends BaseTestCase
 {
-    use WithFaker, RefreshDatabase;
+    use WithFaker;
+    use RefreshDatabase;
 
     /**
      * Runs before the test starts.

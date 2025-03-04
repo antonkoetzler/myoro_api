@@ -21,3 +21,7 @@
 # NEW WAY TO START DOCKER TELL UR FRIENDS
 
 `docker compose up --build -d`
+
+# Fixing and formatting
+Formatting: `PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix <app, tests, routes, and database>`
+Fixing: `./vendor/bin/phpstan analyse <app, tests, routes and database> --memory-limit=1G`

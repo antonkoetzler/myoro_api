@@ -20,7 +20,7 @@ class SignupRequest extends FormRequest
     /**
      * Validation rules of the request.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function rules(): array
     {

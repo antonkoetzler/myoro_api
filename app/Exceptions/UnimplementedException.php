@@ -4,7 +4,9 @@ namespace App\Exceptions;
 
 class UnimplementedException extends ApiException
 {
-    protected $message = 'Not implemented.';
+    /** @var string */
+    protected $message = 'This feature is not implemented yet.';
+
+    /** @var int */
     protected $code = 501;
 }
-

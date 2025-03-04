@@ -12,7 +12,7 @@ class ApiExceptionTest extends TestCase
     {
         $message = 'Custom exception';
         $code = 400;
-        $exception = new class($message, $code) extends ApiException {};
+        $exception = new class ($message, $code) extends ApiException {};
         $response = $exception->render();
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(400, $response->getStatusCode());

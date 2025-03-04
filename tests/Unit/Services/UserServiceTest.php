@@ -44,6 +44,7 @@ class UserServiceTest extends TestCase
     public function testLogin(): void
     {
         $password = $this->faker->password();
+        /** @var User */
         $user = User::factory()->create([
             User::PASSWORD => bcrypt($password),
         ]);

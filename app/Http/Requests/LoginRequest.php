@@ -21,7 +21,7 @@ class LoginRequest extends FormRequest
     /**
      * Validation rules of the request.
      *
-     * @return array
+     * @return array<string, string|null>
      */
     public function rules(): array
     {
@@ -36,12 +36,15 @@ class LoginRequest extends FormRequest
      * Additional validation of the request
      *
      * @param Validator $validator
+     *
      * @return void
      */
     public function withValidator(Validator $validator): void
     {
-        $validator->after(function ($validator) {
-            if ((!$this->username && !$this->email) || ($this->username && $this->email)) {
+        $validator->after(function (Validator $validator) {
+            $username = $this->input(User::USERNAME);
+            $email = $this->input(User::EMAIL);
+            if ((!$username && !$email) || ($username && $email)) {
                 $validator->errors()->add(User::USERNAME, 'Username (x)or email is required.');
                 $validator->errors()->add(User::EMAIL, 'Username (x)or email is required.');
             }

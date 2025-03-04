@@ -7,6 +7,9 @@ namespace App\Exceptions;
  */
 class ResourceNotFoundException extends ApiException
 {
+    /** @var string */
     protected $message = 'Resource not found.';
+
+    /** @var int */
     protected $code = 404;
 }

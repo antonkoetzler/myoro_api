@@ -14,7 +14,7 @@ class UserService
     /**
      * IOC-able User:all.
      *
-     * @return Collection
+     * @return Collection<int, User>
      */
     public function all(): Collection
     {
@@ -24,16 +24,19 @@ class UserService
     /**
      * Signs up a User.
      *
-     * @param array $validatedData
+     * @param array<string, string|null> $validatedData
+     *
      * @return User
      */
     public function signup(array $validatedData): User
     {
+        $password = (string) $validatedData[User::PASSWORD];
+
         $user = User::create([
             User::NAME => $validatedData[User::NAME],
             User::USERNAME => $validatedData[User::USERNAME],
             User::EMAIL => $validatedData[User::EMAIL],
-            User::PASSWORD => bcrypt($validatedData[User::PASSWORD]),
+            User::PASSWORD => bcrypt($password),
         ]);
 
         return $user;
@@ -42,11 +45,13 @@ class UserService
     /**
      * Logs in a user.
      *
-     * @param array $validatedData
+     * @param array<string, string> $validatedData
+     *
      * @return User
      */
     public function login(array $validatedData): User
     {
+        /** @var User|null */
         $user = User::where(User::USERNAME, $validatedData[User::USERNAME])
             ->orWhere(User::EMAIL, $validatedData[User::EMAIL])
             ->first();

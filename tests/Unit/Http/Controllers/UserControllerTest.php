@@ -9,6 +9,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\SignupRequest;
 use App\Models\User;
 use App\Services\UserService;
+use ArrayAccess;
 use AssertionError;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ class UserControllerTest extends TestCase
 
     private function createPersonalTokenMock(): object
     {
-        return new class($this->token) {
+        return new class ($this->token) {
             private $token;
             public function __construct($token)
             {
@@ -177,12 +178,19 @@ class UserControllerTest extends TestCase
         $response = $controller->login($request);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $responseData = json_decode($response->getContent(), true);
+        $content = $response->getContent();
+        $this->assertIsString($content, 'Response content is not a string');
+        /** @var array<string, string|int> */
+        $responseData = json_decode($content, true);
+        $responseDataMessage = (string) $responseData['message'];
+        $responseDataUserId = (int) $responseData['user_id'];
+        $responseDataToken = (string) $responseData['token'];
+
         $this->assertArrayHasKey('message', $responseData);
         $this->assertArrayHasKey('user_id', $responseData);
         $this->assertArrayHasKey('token', $responseData);
-        $this->assertEquals('Login successful!', $responseData['message']);
-        $this->assertEquals($this->user->id, $responseData['user_id']);
-        $this->assertEquals($this->token, $responseData['token']);
+        $this->assertEquals('Login successful!', $responseDataMessage);
+        $this->assertEquals($this->user->id, $responseDataUserId);
+        $this->assertEquals($this->token, $responseDataToken);
     }
 }

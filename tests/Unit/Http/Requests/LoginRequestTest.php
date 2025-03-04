@@ -10,6 +10,7 @@ use Tests\TestCase;
 class LoginRequestTest extends TestCase
 {
     protected LoginRequest $request;
+    /** @var array<string, string|null> */
     protected array $rules;
 
     public function setUp(): void

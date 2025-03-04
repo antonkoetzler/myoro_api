@@ -16,4 +16,3 @@ class ResourceNotFoundExceptionTest extends TestCase
         throw $exception;
     }
 }
-
