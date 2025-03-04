@@ -76,7 +76,6 @@ class UserController extends Controller
      * Signup implementation.
      *
      * @param SignupRequest $request
-     *
      * @return JsonResponse
      */
     public function signup(SignupRequest $request): JsonResponse

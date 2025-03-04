@@ -9,7 +9,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\SignupRequest;
 use App\Models\User;
 use App\Services\UserService;
-use AssertionError;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Mockery\Expectation;
 use Mockery\MockInterface;
@@ -26,7 +26,7 @@ class UserControllerTest extends TestCase
 
     private function createPersonalTokenMock(): object
     {
-        return new class ($this->token) {
+        return new class($this->token) {
             private string $token;
 
             public function __construct(string $token)
@@ -141,10 +141,10 @@ class UserControllerTest extends TestCase
         $userServiceMock = $this->mock(UserService::class, function (MockInterface $mock) {
             /** @var Expectation */
             $expectation = $mock->shouldReceive('signup');
-            $expectation->with([])->andThrow(new AssertionError());
+            $expectation->with([])->andThrow(new Exception());
         });
 
-        $this->expectException(AssertionError::class);
+        $this->expectException(Exception::class);
         $controller = new UserController($userServiceMock);
         $controller->signup($requestMock);
     }
@@ -190,10 +190,10 @@ class UserControllerTest extends TestCase
         $userServiceMock = $this->mock(UserService::class, function (MockInterface $mock) {
             /** @var Expectation */
             $expectation = $mock->shouldReceive('login');
-            $expectation->with([])->andThrow(new AssertionError());
+            $expectation->with([])->andThrow(new Exception());
         });
 
-        $this->expectException(AssertionError::class);
+        $this->expectException(Exception::class);
         $controller = new UserController($userServiceMock);
         $controller->login($requestMock);
     }
