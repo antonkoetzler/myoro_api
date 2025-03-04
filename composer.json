@@ -60,7 +60,7 @@
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite"
         ],
         "format-and-fix": [
-          "PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix app tests routes database",
+          "PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix",
           "./vendor/bin/phpstan analyse app tests routes database --level=max --memory-limit=1G"
         ]
     },
