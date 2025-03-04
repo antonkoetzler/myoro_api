@@ -20,6 +20,11 @@ class SignupRequestTest extends TestCase
         $this->rules = $this->request->rules();
     }
 
+    public function testAuthorize(): void
+    {
+        $this->assertTrue($this->request->authorize());
+    }
+
     public function testEmptyCase(): void
     {
         $validationData = [];

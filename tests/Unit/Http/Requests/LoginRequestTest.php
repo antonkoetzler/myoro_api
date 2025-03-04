@@ -13,6 +13,11 @@ class LoginRequestTest extends TestCase
     /** @var array<string, string|null> */
     protected array $rules;
 
+    public function testAuthorize(): void
+    {
+        $this->assertTrue($this->request->authorize());
+    }
+
     public function setUp(): void
     {
         parent::setUp();

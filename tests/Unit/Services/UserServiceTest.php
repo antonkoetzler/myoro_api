@@ -4,6 +4,7 @@ namespace Tests\Unit\Services;
 
 use App\Models\User;
 use App\Services\UserService;
+use Exception;
 use Tests\TestCase;
 
 class UserServiceTest extends TestCase
@@ -41,7 +42,24 @@ class UserServiceTest extends TestCase
         $this->assertInstanceOf(User::class, $user);
     }
 
-    public function testLogin(): void
+    public function testLoginException(): void
+    {
+        User::factory()->create([
+            User::PASSWORD => bcrypt('Hello, World!'),
+        ]);
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Username/email and/or password are incorrect.');
+        $this->expectExceptionCode(401);
+
+        $this->userService->login([
+            User::USERNAME => $this->faker->userName(),
+            User::EMAIL => $this->faker->email(),
+            User::PASSWORD => 'Wrong password.',
+        ]);
+    }
+
+    public function testLoginSuccess(): void
     {
         $password = $this->faker->password();
         /** @var User */

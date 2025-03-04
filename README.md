@@ -22,8 +22,8 @@
 
 1. Make sure the API is running with `sail up`
 2. Options for the running tests:
-- `sail artisan test` or `docker compose exec laravel.test php artisan test` can be used, but they are slow
-- Enter the Sail Laravel container directly with `sail shell`, then run `php artisan test` within the shell; very fast
+- `sail artisan test --coverage` or `docker compose exec laravel.test php artisan test --coverage` can be used, but they are slow
+- Enter the Sail Laravel container directly with `sail shell`, then run `php artisan test --coverage` within the shell; very fast
 
 ## (TODO: Remove this from this file) Fixing and formatting
 Formatting: `PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix <app, tests, routes, and database>`

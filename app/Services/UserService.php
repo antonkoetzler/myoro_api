@@ -57,7 +57,10 @@ class UserService
             ->first();
 
         if (!$user || !Hash::check($validatedData[User::PASSWORD], $user->password)) {
-            throw new \Exception('Username/email and/or password are incorrect.', 401);
+            throw new \Exception(
+                'Username/email and/or password are incorrect.',
+                401,
+            );
         }
 
         return $user;

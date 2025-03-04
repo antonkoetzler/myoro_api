@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 class UserController extends Controller
 {
     protected UserService $userService;
+
     /**
      * Get the model class name.
      *
@@ -26,6 +27,7 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
