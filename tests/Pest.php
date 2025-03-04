@@ -14,7 +14,7 @@ namespace Tests;
 */
 
 pest()->extend(TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -28,10 +28,10 @@ pest()->extend(TestCase::class)
 |
 */
 
-expect()->extend('toBeOne', function () {
-    /** @var \Pest\Expectation $this */
+/* expect()->extend('toBeOne', function () {
+    @var \Pest\Expectation $this
     return $this->toBe(1);
-});
+}); */
 
 /*
 |--------------------------------------------------------------------------
@@ -42,9 +42,6 @@ expect()->extend('toBeOne', function () {
 | project that you don't want to repeat in every file. Here you can also expose helpers as
 | global functions to help you to reduce the number of lines of code in your test files.
 |
-*/
+ */
 
-function something()
-{
-    // ..
-}
+/* function something() {} */

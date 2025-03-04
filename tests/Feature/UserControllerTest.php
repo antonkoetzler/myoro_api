@@ -28,6 +28,7 @@ class UserControllerTest extends TestCase
 
     public function testShow(): void
     {
+        /** @var User */
         $user = User::factory()->create();
         $response = $this->getJson('/api/users/' . $user->id);
         $response
@@ -41,6 +42,7 @@ class UserControllerTest extends TestCase
 
     public function testUpdate(): void
     {
+        /** @var User */
         $user = User::factory()->create();
         $data = [];
         $response = $this->putJson('/api/users/' . $user->id, $data);
@@ -49,6 +51,7 @@ class UserControllerTest extends TestCase
 
     public function testDestroy(): void
     {
+        /** @var User */
         $user = User::factory()->create();
         $response = $this->deleteJson('/api/users/' . $user->id);
         $response->assertStatus(501);

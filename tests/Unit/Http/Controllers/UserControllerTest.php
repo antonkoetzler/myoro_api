@@ -9,10 +9,9 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\SignupRequest;
 use App\Models\User;
 use App\Services\UserService;
-use ArrayAccess;
 use AssertionError;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Mockery\Expectation;
 use Mockery\MockInterface;
 use Tests\TestCase;
 
@@ -28,15 +27,22 @@ class UserControllerTest extends TestCase
     private function createPersonalTokenMock(): object
     {
         return new class ($this->token) {
-            private $token;
-            public function __construct($token)
+            private string $token;
+
+            public function __construct(string $token)
             {
                 $this->token = $token;
             }
-            // When Laravel tries to access ->plainTextToken, this magic method is called.
-            //
-            // This mimics how Laravel's actual token object works
-            public function __get($name)
+
+            /**
+             * When Laravel tries to access ->plainTextToken, this magic method is called.
+             *
+             * This mimics how Laravel's actual token object works.
+             *
+             * @param string $name
+             * @return string|null
+             */
+            public function __get(string $name): string|null
             {
                 return $name === 'plainTextToken' ? $this->token : null;
             }
@@ -45,17 +51,27 @@ class UserControllerTest extends TestCase
 
     private function createUserMock(): User | MockInterface
     {
-        return $this->mock(User::class, function ($mock) {
-            $mock->shouldReceive('getAttribute')->with('id')->andReturn($this->user->id);
-            $mock->shouldReceive('createToken')->with('MyoroAPI')->andReturn($this->personalTokenMock);
+        return $this->mock(User::class, function (MockInterface $mock) {
+            /** @var Expectation */
+            $getAttributeExpectation = $mock->shouldReceive('getAttribute');
+            $getAttributeExpectation->with('id')->andReturn($this->user->id);
+
+            /** @var Expectation */
+            $createTokenExpectation = $mock->shouldReceive('createToken');
+            $createTokenExpectation->with('MyoroAPI')->andReturn($this->personalTokenMock);
         });
     }
 
     private function createRequestMock(string $requestClass): MockInterface
     {
-        return $this->mock($requestClass, function ($mock) {
-            $mock->shouldReceive('all')->andReturn([]);
-            $mock->shouldReceive('validated')->andReturn([]);
+        return $this->mock($requestClass, function (MockInterface $mock) {
+            /** @var Expectation */
+            $allExpectation = $mock->shouldReceive('all');
+            $allExpectation->andReturn([]);
+
+            /** @var Expectation */
+            $validatedExpectation = $mock->shouldReceive('validated');
+            $validatedExpectation->andReturn([]);
         });
     }
 
@@ -64,7 +80,9 @@ class UserControllerTest extends TestCase
         parent::setUp();
         $this->userService = new UserService();
         $this->controller = new UserController($this->userService);
-        $this->user = User::factory()->create();
+        /** @var User */
+        $userFactory = User::factory()->count(1)->create()->first();
+        $this->user = $userFactory;
         $this->token = $this->faker->text();
         $this->personalTokenMock = $this->createPersonalTokenMock();
         $this->userMock = $this->createUserMock();
@@ -72,9 +90,13 @@ class UserControllerTest extends TestCase
 
     public function testIndex(): void
     {
-        $response = $this->controller->index(new Request());
+        $response = $this->controller->index();
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals([$this->user->toArray()], json_decode($response->getContent(), true));
+        $content = $response->getContent();
+        $this->assertIsString($content, 'Response content is not a string.');
+        /** @var array<string, string|int> */
+        $responseData = json_decode($content, true);
+        $this->assertEquals([$this->user->toArray()], $responseData);
     }
 
     public function testStore(): void
@@ -86,14 +108,16 @@ class UserControllerTest extends TestCase
     public function testShowException(): void
     {
         $this->expectException(ResourceNotFoundException::class);
-        $this->controller->show(1);
+        $this->controller->show('1');
     }
 
     public function testShowSuccessful(): void
     {
         $response = $this->controller->show($this->user->id);
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals($this->user->id, $response->getData()->id);
+        /** @var object{id: int|string} */
+        $data = $response->getData();
+        $this->assertEquals($this->user->id, $data->id);
     }
 
     public function testUpdate(): void
@@ -110,12 +134,14 @@ class UserControllerTest extends TestCase
 
     public function testSignupException(): void
     {
-        /** @var SignupRequest|LegacyMockInterface|MockInterface */
+        /** @var SignupRequest&MockInterface */
         $requestMock = $this->createRequestMock(SignupRequest::class);
 
-        /** @var UserService|LegacyMockInterface|MockInterface */
-        $userServiceMock = $this->mock(UserService::class, function ($mock) {
-            $mock->shouldReceive('signup')->with([])->andThrow(new AssertionError());
+        /** @var UserService&MockInterface */
+        $userServiceMock = $this->mock(UserService::class, function (MockInterface $mock) {
+            /** @var Expectation */
+            $expectation = $mock->shouldReceive('signup');
+            $expectation->with([])->andThrow(new AssertionError());
         });
 
         $this->expectException(AssertionError::class);
@@ -125,35 +151,46 @@ class UserControllerTest extends TestCase
 
     public function testSignupSuccess(): void
     {
-        /** @var SignupRequest|MockInterface */
+        /** @var SignupRequest&MockInterface */
         $requestMock = $this->createRequestMock(SignupRequest::class);
 
-        /** @var UserService|MockInterface */
-        $userServiceMock = $this->mock(UserService::class, function ($mock) {
-            $mock->shouldReceive('signup')->once()->with([])->andReturn($this->userMock);
+        /** @var UserService&MockInterface */
+        $userServiceMock = $this->mock(UserService::class, function (MockInterface $mock) {
+            /** @var Expectation */
+            $expectation = $mock->shouldReceive('signup');
+            $expectation->once()->with([])->andReturn($this->userMock);
         });
 
         $controller = new UserController($userServiceMock);
         $response = $controller->signup($requestMock);
-
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $responseData = json_decode($response->getContent(), true);
+        $content = $response->getContent();
+        $this->assertIsString($content, 'Response content is not a string.');
+
+        /** @var array<string, string|int> */
+        $responseData = json_decode($content, true);
+        $responseDataMessage = (string) $responseData['message'];
+        $responseDataUserId = (int) $responseData['user_id'];
+        $responseDataToken = (string) $responseData['token'];
+
         $this->assertArrayHasKey('message', $responseData);
         $this->assertArrayHasKey('user_id', $responseData);
         $this->assertArrayHasKey('token', $responseData);
-        $this->assertEquals('User registered successfully!', $responseData['message']);
-        $this->assertEquals($this->user->id, $responseData['user_id']);
-        $this->assertEquals($this->token, $responseData['token']);
+        $this->assertEquals('User registered successfully!', $responseDataMessage);
+        $this->assertEquals($this->user->id, $responseDataUserId);
+        $this->assertEquals($this->token, $responseDataToken);
     }
 
     public function testLoginException(): void
     {
-        /** @var LoginRequest|MockInterface */
+        /** @var LoginRequest&MockInterface */
         $requestMock = $this->createRequestMock(LoginRequest::class);
 
-        /** @var UserService|MockInterface */
-        $userServiceMock = $this->mock(UserService::class, function ($mock) {
-            $mock->shouldReceive('login')->with([])->andThrow(new AssertionError());
+        /** @var UserService&MockInterface */
+        $userServiceMock = $this->mock(UserService::class, function (MockInterface $mock) {
+            /** @var Expectation */
+            $expectation = $mock->shouldReceive('login');
+            $expectation->with([])->andThrow(new AssertionError());
         });
 
         $this->expectException(AssertionError::class);
@@ -163,15 +200,22 @@ class UserControllerTest extends TestCase
 
     public function testLoginSuccess(): void
     {
-        /** @var LoginRequest|LegacyMockInterface|MockInterface */
-        $request = $this->mock(LoginRequest::class, function ($mock) {
-            $mock->shouldReceive('all')->andReturn([]);
-            $mock->shouldReceive('validated')->andReturn([]);
+        /** @var LoginRequest&MockInterface */
+        $request = $this->mock(LoginRequest::class, function (MockInterface $mock) {
+            /** @var Expectation */
+            $allExpectation = $mock->shouldReceive('all');
+            $allExpectation->andReturn([]);
+
+            /** @var Expectation */
+            $validatedExpectation = $mock->shouldReceive('validated');
+            $validatedExpectation->andReturn([]);
         });
 
-        /** @var UserService|LegacyMockInterface|MockInterface */
-        $userServiceMock = $this->mock(UserService::class, function ($mock) {
-            $mock->shouldReceive('login')->with([])->andReturn($this->userMock);
+        /** @var UserService&MockInterface */
+        $userServiceMock = $this->mock(UserService::class, function (MockInterface $mock) {
+            /** @var Expectation */
+            $expectation = $mock->shouldReceive('login');
+            $expectation->with([])->andReturn($this->userMock);
         });
 
         $controller = new UserController($userServiceMock);
@@ -179,7 +223,8 @@ class UserControllerTest extends TestCase
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $content = $response->getContent();
-        $this->assertIsString($content, 'Response content is not a string');
+        $this->assertIsString($content, 'Response content is not a string.');
+
         /** @var array<string, string|int> */
         $responseData = json_decode($content, true);
         $responseDataMessage = (string) $responseData['message'];
