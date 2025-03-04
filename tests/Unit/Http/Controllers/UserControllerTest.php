@@ -26,7 +26,7 @@ class UserControllerTest extends TestCase
 
     private function createPersonalTokenMock(): object
     {
-        return new class($this->token) {
+        return new class ($this->token) {
             private string $token;
 
             public function __construct(string $token)
