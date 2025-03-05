@@ -20,5 +20,11 @@ jobs:
         with:
           php-version: '8.4.1'
 
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v1
+
       - name: Install dependencies
         run: composer install
+
+      - name: Start Sail
+        run: sail up -d --build
