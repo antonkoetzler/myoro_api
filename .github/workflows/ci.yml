@@ -30,6 +30,4 @@ jobs:
         run: ./vendor/bin/sail up -d --build
 
       - name: Run tests (fails if any test fails or if code coverage isn't 100%)
-        run: |
-          ./vendor/bin/sail shell
-          php artisan test --coverage
+        run: ./vendor/bin/sail artisan test --coverage
