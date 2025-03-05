@@ -8,3 +8,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        php-version: '8.4.1'
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-sugest
