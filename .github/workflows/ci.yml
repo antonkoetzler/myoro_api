@@ -27,4 +27,4 @@ jobs:
         run: composer install
 
       - name: Start Sail
-        run: sail up -d --build
+        run: ./vendor/bin/sail up -d --build
