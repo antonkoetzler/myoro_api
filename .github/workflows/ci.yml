@@ -1,4 +1,4 @@
-name: CI/CD ~ Tests, code coverage, and formatting/fixing code
+name: CI/CD
 
 on: [push, pull_request]
 
