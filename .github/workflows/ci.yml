@@ -1,0 +1,10 @@
+name: CI/CD ~ Tests, code coverage, and formatting/fixing code
+
+on: [push, pull_request]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4

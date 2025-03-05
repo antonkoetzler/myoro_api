@@ -56,4 +56,90 @@ class UserControllerTest extends TestCase
         $response = $this->deleteJson('/api/users/' . $user->id);
         $response->assertStatus(501);
     }
+
+    public function testSignupException(): void
+    {
+        $data = [];
+        $response = $this->postJson('/api/users/signup', $data);
+        $response->assertStatus(422)->assertJson([
+            'message' => 'The ' . User::NAME . ' field is required. (and 3 more errors)',
+        ]);
+    }
+
+    public function testSignupSuccess(): void
+    {
+        $data = $this->makeValidUserSignupRequestData();
+        $response = $this->postJson('api/users/signup', $data);
+        $response
+            ->assertStatus(201)
+            ->assertJsonStructure([
+                'message',
+                'user_id',
+                'token',
+            ])->assertJson([
+                'message' => 'User registered successfully!',
+            ]);
+    }
+
+    public function testLoginException(): void
+    {
+        $data = [];
+        $response = $this->postJson('/api/users/login', $data);
+        $response
+            ->assertStatus(422)
+            ->assertJson([
+                'message' => 'The ' . User::PASSWORD . ' field is required. (and 2 more errors)',
+            ]);
+    }
+
+    public function testLoginSuccess(): void
+    {
+        $data = $this->makeValidUserSignupRequestData();
+        $signupResponse = $this->postJson('api/users/signup', $data);
+        $signupResponse->assertStatus(201);
+
+        $emailProvided = $this->faker->boolean();
+        $username = $emailProvided ? null : $data[User::USERNAME];
+        $email = $emailProvided ? $data[User::EMAIL] : null;
+        $password = $data[User::PASSWORD];
+        $loginResponse = $this->postJson(
+            '/api/users/login',
+            [
+                User::USERNAME => $username,
+                User::EMAIL => $email,
+                User::PASSWORD => $password,
+            ],
+        );
+        $loginResponse
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'message',
+                'user_id',
+                'token',
+            ])
+            ->assertJson([
+                'message' => 'Login successful!',
+            ]);
+    }
+
+    /**
+     * Helper function to make the request JSON to signup a User
+     *
+     * @see User
+     * @return array<string|string>
+     */
+    private function makeValidUserSignupRequestData(): array
+    {
+        $name = $this->faker->name();
+        $username = $this->faker->lexify(str_repeat('?', $this->faker->numberBetween(8, 255)));
+        $email = $this->faker->email();
+        $password = $this->faker->lexify(str_repeat('?', $this->faker->numberBetween(8, 255)));
+        return [
+            User::NAME => $name,
+            User::USERNAME => $username,
+            User::EMAIL => $email,
+            User::PASSWORD => $password,
+            User::PASSWORD_CONFIRMATION => $password,
+        ];
+    }
 }

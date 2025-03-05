@@ -1,6 +1,5 @@
 # TODO
 
-1. Still have to (feature) test UserController::login and UserController::signup;
 1. Test, format and fix GitHub Action;
 {
   "scripts": {
