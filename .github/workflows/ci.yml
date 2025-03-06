@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: composer install
 
+      - name: Fix permissions
+        run: sudo chmod -R 777 vendor/pestphp/pest/.temp
+
       - name: Start Sail
         run: ./vendor/bin/sail up -d --build
 
