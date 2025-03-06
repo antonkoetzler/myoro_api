@@ -30,7 +30,7 @@ jobs:
         run: sudo chmod -R 777 vendor/pestphp/pest/.temp
 
       - name: Start Sail
-        run: ./vendor/bin/sail up -d --build
+        run: ./vendor/bin/sail up -d --build && ./vendor/bin/sail artisan config:clear
 
       - name: Run tests (fails if any test fails or if code coverage isn't 100%)
         run: ./vendor/bin/sail artisan test --coverage
