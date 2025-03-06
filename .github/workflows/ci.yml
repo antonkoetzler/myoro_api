@@ -27,13 +27,17 @@ jobs:
         run: composer install
 
       - name: Fix permissions
-        run: sudo chmod -R 777 /var/www/html/storage/logs vendor/pestphp/pest/.temp
+        run: |
+          mkdir -p storage/logs vendor/pestphp/pest/.temp
+          sudo chmod -R 777 /var/www/html/storage/logs vendor/pestphp/pest/.temp
 
       - name: Generate Laravel key
         run: php artisan key:generate
 
       - name: Start Sail
-        run: ./vendor/bin/sail up -d --build && ./vendor/bin/sail artisan config:clear
+        run: |
+          ./vendor/bin/sail up -d --build
+          ./vendor/bin/sail artisan config:clear
 
       - name: Run tests (fails if any test fails or if code coverage isn't 100%)
         run: ./vendor/bin/sail artisan test --coverage
