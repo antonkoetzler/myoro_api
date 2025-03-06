@@ -27,7 +27,7 @@ jobs:
         run: composer install
 
       - name: Fix permissions
-        run: sudo chmod -R 777 vendor/pestphp/pest/.temp
+        run: sudo chmod -R 777 /var/www/html/storage/logs vendor/pestphp/pest/.temp
 
       - name: Generate Laravel key
         run: php artisan key:generate
