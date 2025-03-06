@@ -29,6 +29,9 @@ jobs:
       - name: Fix permissions
         run: sudo chmod -R 777 vendor/pestphp/pest/.temp
 
+      - name: Generate Laravel key
+        run: php artisan key:generate
+
       - name: Start Sail
         run: ./vendor/bin/sail up -d --build && ./vendor/bin/sail artisan config:clear
 
