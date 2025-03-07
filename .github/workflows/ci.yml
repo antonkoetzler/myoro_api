@@ -28,7 +28,7 @@ jobs:
 
       - name: Fix permissions
         run: |
-          mkdir -p storage/logs vendor/pestphp/pest/.temp
+          mkdir -p /var/www/html/storage/logs vendor/pestphp/pest/.temp
           sudo chmod -R 777 /var/www/html/storage/logs vendor/pestphp/pest/.temp
 
       - name: Generate Laravel key
