@@ -17,6 +17,11 @@
             <directory>app</directory>
         </include>
     </source>
+    <coverage>
+        <threshold>
+            <min>100</min>
+        </threshold>
+    </coverage>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
