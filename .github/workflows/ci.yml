@@ -32,5 +32,7 @@ jobs:
       - name: Run Migrations
         run: ./vendor/bin/sail artisan migrate --env=testing --force
 
-      - name: Run Tests
-        run: XDEBUG_MODE=coverage ./vendor/bin/sail artisan test --coverage
+      # - name: Run Tests
+      #   run: XDEBUG_MODE=coverage ./vendor/bin/sail artisan test --coverage
+      - name: Run Tests with Coverage
+        run: ./vendor/bin/sail exec laravel.test env XDEBUG_MODE=coverage php artisan test --coverage
