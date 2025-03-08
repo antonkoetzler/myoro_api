@@ -29,10 +29,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Docker
-        run: |
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-          docker buildx create --use
+      - name: Install Dependencies
+        run: ./vendor/bin/sail composer install
 
       - name: Start Sail
         run: |
@@ -43,11 +41,8 @@ jobs:
           echo "DB_PASSWORD=password" >> .env.testing
           ./vendor/bin/sail up -d
 
-      - name: Install Dependencies
-        run: ./vendor/bin/sail composer install
-
       - name: Run Migrations
         run: ./vendor/bin/sail artisan migrate --env=testing --force
 
       - name: Run Tests
-        run: ./vendor/bin/sail test
+        run: ./vendor/bin/sail artisan test --coverage
