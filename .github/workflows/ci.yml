@@ -10,21 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_DB: myoro_api_test
-          POSTGRES_USER: sail
-          POSTGRES_PASSWORD: password
-        ports:
-          - 5632:5432
-        options: >-
-          --health-cmd "pg_isready -U sail -d myoro_api_test"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -39,6 +24,7 @@ jobs:
           echo "DB_DATABASE=myoro_api_test" >> .env.testing
           echo "DB_USERNAME=sail" >> .env.testing
           echo "DB_PASSWORD=password" >> .env.testing
+          echo "FORWARD_DB_PORT=0" >> .env.testing
           ./vendor/bin/sail down
           ./vendor/bin/sail up -d --remove-orphans
 
