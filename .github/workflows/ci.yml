@@ -33,4 +33,4 @@ jobs:
         run: ./vendor/bin/sail artisan migrate --env=testing --force
 
       - name: Run Tests
-        run: ./vendor/bin/sail artisan test --coverage
+        run: XDEBUG_MODE=coverage ./vendor/bin/sail artisan test --coverage
