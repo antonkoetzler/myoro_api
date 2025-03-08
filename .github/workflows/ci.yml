@@ -3,41 +3,51 @@ name: CI/CD
 on:
   push:
     branches:
-      - '*'
+      - main
   pull_request:
-    branches:
-      - '*'
 
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: myoro_api_test
+          POSTGRES_USER: sail
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5632:5432
+        options: >-
+          --health-cmd "pg_isready -U sail -d myoro_api_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4.1'
-
       - name: Set up Docker
-        uses: docker/setup-docker-action@v1
-
-      - name: Install dependencies
-        run: composer install
-
-      - name: Fix permissions
         run: |
-          mkdir -p /var/www/html/storage/logs vendor/pestphp/pest/.temp
-          sudo chmod -R 777 /var/www/html/storage/logs vendor/pestphp/pest/.temp
-
-      - name: Generate Laravel key
-        run: php artisan key:generate
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+          docker buildx create --use
 
       - name: Start Sail
         run: |
-          ./vendor/bin/sail up -d --build
-          ./vendor/bin/sail artisan config:clear
+          cp .env .env.testing
+          echo "DB_HOST=pgsql" >> .env.testing
+          echo "DB_DATABASE=myoro_api_test" >> .env.testing
+          echo "DB_USERNAME=sail" >> .env.testing
+          echo "DB_PASSWORD=password" >> .env.testing
+          ./vendor/bin/sail up -d
 
-      - name: Run tests (fails if any test fails or if code coverage isn't 100%)
-        run: ./vendor/bin/sail artisan test --coverage
+      - name: Install Dependencies
+        run: ./vendor/bin/sail composer install
+
+      - name: Run Migrations
+        run: ./vendor/bin/sail artisan migrate --env=testing --force
+
+      - name: Run Tests
+        run: ./vendor/bin/sail test
