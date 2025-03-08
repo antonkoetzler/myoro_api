@@ -1,10 +1,51 @@
-name: CI/CD ~ Tests, code coverage, and formatting/fixing code
+name: CI/CD
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: composer install
+
+      - name: Start Sail
+        run: |
+          ./vendor/bin/sail down
+          ./vendor/bin/sail up -d --remove-orphans
+
+      - name: Wait for PostgreSQL
+        run: |
+          ./vendor/bin/sail exec pgsql sh -c 'until pg_isready -U sail -d myoro_api_test; do sleep 1; done'
+
+      - name: Fix Storage Permissions
+        run: |
+          ./vendor/bin/sail exec laravel.test chmod -R 777 storage/logs
+
+      - name: Run Migrations
+        run: |
+          ./vendor/bin/sail artisan migrate --env=testing --force
+
+      - name: Run Tests with Coverage (only passes if all tests pass with 100% code coverage)
+        run: |
+          result=$(./vendor/bin/sail exec laravel.test env XDEBUG_MODE=coverage php artisan test --coverage)
+          echo "$result"
+          if [[ "$result" != *"Total: 100.0 %"* ]]; then
+            echo "Test coverage is not 100%. Failing the step."
+            exit 1
+          fi
+
+      - name: Format code (only passes if no files are formatted)
+        run: |
+          PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix app tests routes database --dry-run --diff --config=.php-cs-fixer.php
+
+      - name: Fixing code (only passes if no files are fixed)
+        run: ./vendor/bin/phpstan analyse app tests routes database --level=max --memory-limit=1G
