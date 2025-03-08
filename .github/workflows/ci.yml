@@ -27,13 +27,21 @@ jobs:
           ./vendor/bin/sail exec pgsql sh -c 'until pg_isready -U sail -d myoro_api_test; do sleep 1; done'
 
       - name: Fix Storage Permissions
-        run: ./vendor/bin/sail exec laravel.test chmod -R 777 storage/logs
+        run: |
+          ./vendor/bin/sail exec laravel.test chmod -R 777 storage/logs
 
       - name: Run Migrations
-        run: ./vendor/bin/sail artisan migrate --env=testing --force
+        run: |
+          ./vendor/bin/sail artisan migrate --env=testing --force
 
       - name: Run Tests with Coverage (only passes if all tests pass with 100% code coverage)
-        run: ./vendor/bin/sail exec laravel.test env XDEBUG_MODE=coverage php artisan test --coverage
+        run: |
+          result=$(./vendor/bin/sail exec laravel.test env XDEBUG_MODE=coverage php artisan test --coverage)
+          echo "$result"
+          if [[ "$result" != *"Total: 100.0 %"* ]]; then
+            echo "Test coverage is not 100%. Failing the step."
+            exit 1
+          fi
 
       - name: Format code (only passes if no files are formatted)
         run: |
