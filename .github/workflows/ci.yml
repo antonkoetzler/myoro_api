@@ -34,3 +34,9 @@ jobs:
 
       - name: Run Tests with Coverage (only passes if all tests pass with 100% code coverage)
         run: ./vendor/bin/sail exec laravel.test env XDEBUG_MODE=coverage php artisan test --coverage
+
+      - name: Format code (only passes if no files are formatted)
+        run: PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix app tests routes database --dry-run --diff
+
+      - name: Fixing code (only passes if no files are fixed)
+        run: ./vendor/bin/phpstan analyse app tests routes database --level=max --memory-limit=1G
